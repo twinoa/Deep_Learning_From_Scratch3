@@ -1,6 +1,6 @@
 import sys
 sys.append('..')
-from dezero import * 
+from before import * 
 
 class SquareTest(unittest.TestCase):
     def test_forward(self):

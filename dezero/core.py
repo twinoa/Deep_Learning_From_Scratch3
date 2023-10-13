@@ -31,7 +31,7 @@ class Variable:
         return self.data.size
     
     @property
-    def dtye(self):
+    def dtype(self):
         return self.data.dtype
     
     def __len__(self):
@@ -136,6 +136,10 @@ class Function:
     def backward(self, gy):
         raise NotImplementedError
     
+
+class Parameter(Variable):
+    pass
+
 
 class Add(Function):
     def forward(self, x0, x1):

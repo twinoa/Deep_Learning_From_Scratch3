@@ -1,5 +1,8 @@
 from dezero.layers import Layer
 from dezero import utils
+import dezero.functions as F
+import dezero.layers as L
+import numpy as np
 
 class Model(Layer):
     def plot(self, *inputs, to_file='model.png'):
@@ -22,3 +25,5 @@ class MLP(Model):
         for l in self.layers[:-1]:
             x = self.activation(l(x))
         return self.layers[-1](x)
+    
+    

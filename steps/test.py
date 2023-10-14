@@ -9,37 +9,29 @@ from dezero.utils import sum_to
 import dezero.functions as F
 import matplotlib.pyplot as plt
 import dezero.layers as L
+from dezero.models import MLP
+from dezero import optimizers
+from dezero import as_variable
+import dezero
+import math
 
 
-np.random.seed(0)
-x = np.random.rand(100, 1)
-y = np.sin(2 * np.pi * x) + np.random.rand(100, 1)
+class MyIterator:
+    def __init__(self, max_cnt):
+        self.max_cnt = max_cnt
+        self.cnt = 0
 
-lr = 0.2
-max_iter = 10000
-hidden_size = 10
-
-class TwoLayerNet(Model):
-    def __init__(self, hidden_size, out_size):
-        super().__init__()
-        self.l1 = L.Linear(hidden_size)
-        self.l2 = L.Linear(out_size)
-
-    def forward(self, x):
-        y = F.sigmoid(self.l1(x))
-        y = self.l2(y)
-        return y
+    def __iter__(self):
+        return self
     
-model = TwoLayerNet(hidden_size, 1)
+    def __next__(self):
+        if self.cnt == self.max_cnt:
+            raise StopIteration()
+        
+        self.cnt += 1
+        return self.cnt
+    
 
-for i in range(max_iter):
-    y_pred = model(x)
-    loss = F.mean_squared_error(y, y_pred)
-
-    model.cleargrads()
-    loss.backward()
-
-    for p in model.params():
-        p.data -= lr * p.grad.data
-    if i % 1000 == 0:
-        print(loss)
+obj = MyIterator(5)
+for x in obj:
+    print(x)

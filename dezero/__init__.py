@@ -23,11 +23,11 @@ else :
     from dezero.layers import Layer
     from dezero.models import Model
     from dezero.datasets import Dataset
-    # from dezero.dataloaders import DataLoader
+    from dezero.dataloaders import DataLoader
     # from dezero.dataloaders import SeqDataLoader
 
     import dezero.datasets
-    # import dezero.dataloaders
+    import dezero.dataloaders
     import dezero.optimizers
     import dezero.functions
     # import dezero.functions_conv

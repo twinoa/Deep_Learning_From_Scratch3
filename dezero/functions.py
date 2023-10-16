@@ -2,8 +2,8 @@ import numpy as np
 from dezero import utils, cuda
 from dezero.core import Function
 from dezero.core import as_variable
-
-
+from dezero.core import Variable
+from dezero.core import as_array
 
 class Reshape(Function):
     def __init__(self, shape):
@@ -29,9 +29,10 @@ class Transpose(Function):
     def backward(self, gy):
         if self.axes is None:
             return transpose(gy)
-
+        
+        xp = cuda.get_array_module(gy)
         axes_len = len(self.axes)
-        inv_axes = tuple(np.argsort([ax % axes_len for ax in self.axes]))
+        inv_axes = tuple(xp.argsort([ax % axes_len for ax in self.axes]))
         return transpose(gy, inv_axes)
 
 
@@ -41,7 +42,8 @@ class BroadcastTo(Function):
 
     def forward(self, x):
         self.x_shape = x.shape
-        y = np.broadcast_to(x, self.shape)
+        xp = cuda.get_array_module(x)
+        y = xp.broadcast_to(x, self.shape)
         return y
     
     def backward(self, gy):
@@ -107,7 +109,8 @@ class MeanSquaredError(Function):
 
 class Cos(Function):
     def forward(self, x):
-        y = np.cos(x)
+        xp = cuda.get_array_module(x)
+        y = xp.cos(x)
         return y
     
     def backward(self, gy):
@@ -118,7 +121,8 @@ class Cos(Function):
 
 class Sin(Function):
     def forward(self, x):
-        y = np.sin(x)
+        xp = cuda.get_array_module(x)
+        y = xp.sin(x)
         return y
     
     def backward(self, gy):
@@ -129,7 +133,8 @@ class Sin(Function):
     
 class Tanh(Function):
     def forward(self, x):
-        y = np.tanh(x)
+        xp = cuda.get_array_module(x)
+        y = xp.tanh(x)
         return y
     
     def backward(self, gy):
@@ -355,3 +360,28 @@ class Clip(Function):
 
 def clip(x, x_min, x_max):
     return Clip(x_min, x_max)(x)
+
+
+def accuracy(y, t):
+    y, t = as_variable(y), as_variable(t)
+
+    pred = y.data.argmax(axis=1).reshape(t.shape)
+    result = (pred == t.data)
+    acc = result.mean()
+    return Variable(as_array(acc))
+
+
+class ReLU(Function):
+    def forward(self, x):
+        xp = cuda.get_array_module(x)
+        y = xp.maximum(x, 0.0)
+        return y
+    
+    def backward(self, gy):
+        x, = self.inputs
+        mask = x.data > 0
+        gx = gy * mask
+        return gx
+    
+def relu(x):
+    return ReLU()(x)

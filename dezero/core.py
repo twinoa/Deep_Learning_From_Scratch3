@@ -6,7 +6,21 @@ import dezero
 
 class Config:
     enable_backprop = True
+    train = True
 
+
+@contextlib.contextmanager
+def using_config(name, value):
+    old_value = getattr(Config, name)
+    setattr(Config, name, value)
+    try:
+        yield
+    finally:
+        setattr(Config, name, old_value)
+
+
+def test_mode():
+    return using_config('train', False)
 
 try:
     import cupy
@@ -223,16 +237,6 @@ class Pow(Function):
         c = self.c
         gx = c * x ** (c - 1) * gy
         return gx
-    
-
-@contextlib.contextmanager
-def using_config(name, value):
-    old_value = getattr(Config, name)
-    setattr(Config, name, value)
-    try:
-        yield
-    finally:
-        setattr(Config, name, old_value)
 
 
 def no_grad():

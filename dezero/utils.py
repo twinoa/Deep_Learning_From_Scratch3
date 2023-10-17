@@ -161,3 +161,11 @@ def pair(x):
         return x
     else:
         raise ValueError
+    
+
+def get_conv_outsize(input_size, kernal_size, stride, pad):
+    return (input_size + pad * 2 - kernal_size) // stride + 1
+
+
+def get_deconv_outsize(size, k, s, p):
+    return s * (size - 1) + k - 2 * p

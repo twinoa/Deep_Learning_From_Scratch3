@@ -79,3 +79,14 @@ class VGG16(Model):
         x = F.dropout(F.relu(self.fc7(x)))
         x = self.fc8(x)
         return x
+    
+    @staticmethod
+    def preprocess(image, size=(224, 224), dtype=np.float32):
+        image = image.convert('RGB')
+        if size:
+            image = image.resize(size)
+        image = np.asarray(image, dtype=dtype)
+        image = image[:, :, ::-1]
+        image -= np.array([103.939, 116.779, 123.68], dtype=dtype)
+        image = image.transpose((2, 0, 1))
+        return image
